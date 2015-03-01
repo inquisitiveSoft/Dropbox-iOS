@@ -52,9 +52,9 @@ static int kDBCredentialsVersion = 3;
 }
 
 + (void)setSharedSession:(DBSession *)session {
-    if (session == _sharedSession) return;
-    [_sharedSession release];
-    _sharedSession = [session retain];
+    if (session != _sharedSession) {
+		_sharedSession = session;
+	}
 }
 
 - (id)initWithAppKey:(NSString *)key appSecret:(NSString *)secret root:(NSString *)theRoot {
@@ -129,18 +129,11 @@ static int kDBCredentialsVersion = 3;
             }
         }
         
-        root = [theRoot retain];
+        root = theRoot;
     }
     return self;
 }
 
-- (void)dealloc {
-    [baseCredentials release];
-    [credentialStores release];
-    [anonymousStore release];
-    [root release];
-    [super dealloc];
-}
 
 @synthesize root;
 @synthesize delegate;
@@ -153,11 +146,9 @@ static int kDBCredentialsVersion = 3;
 - (void)setAccessToken:(NSString *)token accessTokenSecret:(NSString *)secret forUserId:(NSString *)userId {
     MPOAuthCredentialConcreteStore *credentialStore = [credentialStores objectForKey:userId];
     if (!credentialStore) {
-        credentialStore = 
-            [[MPOAuthCredentialConcreteStore alloc] initWithCredentials:baseCredentials];
+        credentialStore = [[MPOAuthCredentialConcreteStore alloc] initWithCredentials:baseCredentials];
         [credentialStores setObject:credentialStore forKey:userId];
-        [credentialStore release];
-        
+		
         if (![userId isEqual:kDBDropboxUnknownUserId] && [credentialStores objectForKey:kDBDropboxUnknownUserId]) {
             // If the unknown user is in credential store, replace it with this new entry
             [credentialStores removeObjectForKey:kDBDropboxUnknownUserId];
@@ -205,15 +196,16 @@ static int kDBCredentialsVersion = 3;
                                         nil];
 
     NSMutableArray *allUserCredentials = [NSMutableArray array];
-    for (NSString *userId in [credentialStores allKeys]) {
+	
+    for(NSString *userId in [credentialStores allKeys]) {
         MPOAuthCredentialConcreteStore *store = [credentialStores objectForKey:userId];
         NSMutableDictionary *userCredentials = [NSMutableDictionary new];
         [userCredentials setObject:userId forKey:kDBDropboxUserId];
         [userCredentials setObject:store.accessToken forKey:kMPOAuthCredentialAccessToken];
         [userCredentials setObject:store.accessTokenSecret forKey:kMPOAuthCredentialAccessTokenSecret];
         [allUserCredentials addObject:userCredentials];
-        [userCredentials release];
     }
+	
     [credentials setObject:allUserCredentials forKey:kDBDropboxUserCredentials];
     [DBKeychain setCredentials:credentials];
 }

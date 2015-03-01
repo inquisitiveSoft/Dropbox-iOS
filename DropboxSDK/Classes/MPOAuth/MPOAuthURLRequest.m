@@ -32,20 +32,12 @@
 - (id)initWithURLRequest:(NSURLRequest *)inRequest {
 	if ((self = [super init])) {
 		self.url = [[inRequest URL] urlByRemovingQuery];
-		self.parameters = [[[MPURLRequestParameter parametersFromString:[[inRequest URL] query]] mutableCopy] autorelease];
+		self.parameters = [[MPURLRequestParameter parametersFromString:[[inRequest URL] query]] mutableCopy];
 		self.HTTPMethod = [inRequest HTTPMethod];
 	}
 	return self;
 }
 
-- (oneway void)dealloc {
-	self.url = nil;
-	self.HTTPMethod = nil;
-	self.urlRequest = nil;
-	self.parameters = nil;
-	
-	[super dealloc];
-}
 
 @synthesize url = _url;
 @synthesize HTTPMethod = _httpMethod;
@@ -83,12 +75,8 @@
 		[NSException raise:@"UnhandledHTTPMethodException" format:@"The requested HTTP method, %@, is not supported", self.HTTPMethod];
 	}
 	
-	[parameterString release];
-	[signatureParameter release];		
-	
 	self.urlRequest = aRequest;
-	[aRequest release];
-		
+	
 	return aRequest;
 }
 

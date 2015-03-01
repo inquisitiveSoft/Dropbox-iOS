@@ -23,14 +23,6 @@ extern NSString * const MPOAuthNotificationErrorHasOccurred;
 @class MPOAuthCredentialConcreteStore;
 
 @interface MPOAuthAPIRequestLoader : NSObject {
-	MPOAuthCredentialConcreteStore	*_credentials;
-	MPOAuthURLRequest				*_oauthRequest;
-	MPOAuthURLResponse				*_oauthResponse;
-	NSMutableData					*_dataBuffer;
-	NSString						*_dataAsString;
-	NSError							*_error;
-	id								_target;
-	SEL								_action;
 }
 
 @property (nonatomic, readwrite, retain) id <MPOAuthCredentialStore, MPOAuthParameterFactory> credentials;

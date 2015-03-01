@@ -13,7 +13,6 @@ extern NSString * const MPOAuthAccessTokenURLKey;
 @class MPOAuthAPI;
 
 @interface MPOAuthAuthenticationMethod : NSObject {
-	MPOAuthAPI								*oauthAPI_;
 	NSURL									*oauthGetAccessTokenURL_;
 	NSTimer									*refreshTimer_;
 }

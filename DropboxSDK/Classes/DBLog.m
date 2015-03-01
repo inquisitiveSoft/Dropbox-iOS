@@ -22,19 +22,6 @@ NSString* DBStringFromLogLevel(DBLogLevel logLevel) {
 	return @"";	
 }
 
-NSString * DBLogFilePath()
-{
-	static NSString *logFilePath;
-	if (logFilePath == nil)
-		logFilePath = [[NSHomeDirectory() stringByAppendingFormat: @"/tmp/run.log"] retain];
-	return logFilePath;
-}
-
-void DBSetupLogToFile()
-{
-	freopen([DBLogFilePath() fileSystemRepresentation], "w", stderr);
-}
-
 static NSString * DBLogFormatPrefix(DBLogLevel logLevel) {
 	return [NSString stringWithFormat: @"[%@] ", DBStringFromLogLevel(logLevel)];
 }

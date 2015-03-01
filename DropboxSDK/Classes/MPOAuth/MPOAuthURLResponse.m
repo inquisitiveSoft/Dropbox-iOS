@@ -15,20 +15,6 @@
 
 @implementation MPOAuthURLResponse
 
-- (id)init {
-	if ((self = [super init])) {
-		
-	}
-	return self;
-}
-
-- (oneway void)dealloc {
-	self.urlResponse = nil;
-	self.oauthParameters = nil;
-	
-	[super dealloc];
-}
-
 @synthesize urlResponse = _urlResponse;
 @synthesize oauthParameters = _oauthParameters;
 

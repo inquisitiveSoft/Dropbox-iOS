@@ -21,7 +21,7 @@
 
 + (MPOAuthConnection *)connectionWithRequest:(MPOAuthURLRequest *)inRequest delegate:(id)inDelegate credentials:(NSObject <MPOAuthCredentialStore, MPOAuthParameterFactory> *)inCredentials {
 	MPOAuthConnection *aConnection = [[MPOAuthConnection alloc] initWithRequest:inRequest delegate:inDelegate credentials:inCredentials];
-	return [aConnection autorelease];
+	return aConnection;
 }
 
 + (NSData *)sendSynchronousRequest:(MPOAuthURLRequest *)inRequest usingCredentials:(NSObject <MPOAuthCredentialStore, MPOAuthParameterFactory> *)inCredentials returningResponse:(MPOAuthURLResponse **)outResponse error:(NSError **)inError {
@@ -29,7 +29,7 @@
 	NSURLRequest *urlRequest = [inRequest urlRequestSignedWithSecret:[inCredentials signingKey] usingMethod:[inCredentials signatureMethod]];
 	NSURLResponse *urlResponse = nil;
 	NSData *responseData = [self sendSynchronousRequest:urlRequest returningResponse:&urlResponse error:inError];
-	MPOAuthURLResponse *oauthResponse = [[[MPOAuthURLResponse alloc] init] autorelease];
+	MPOAuthURLResponse *oauthResponse = [[MPOAuthURLResponse alloc] init];
 	oauthResponse.urlResponse = urlResponse;
 	*outResponse = oauthResponse;
 	
@@ -40,19 +40,13 @@
 	[inRequest addParameters:[inCredentials oauthParameters]];
 	NSURLRequest *urlRequest = [inRequest urlRequestSignedWithSecret:[inCredentials signingKey] usingMethod:[inCredentials signatureMethod]];
 	if ((self = [super initWithRequest:urlRequest delegate:inDelegate])) {
-		_credentials = (MPOAuthCredentialConcreteStore *)[inCredentials retain];
+		_credentials = (MPOAuthCredentialConcreteStore *)inCredentials;
 	}
 	return self;
 }
 
-- (oneway void)dealloc {
-	[_credentials release];
-	
-	[super dealloc];
-}
 
 @synthesize credentials = _credentials;
 
-#pragma mark -
 
 @end

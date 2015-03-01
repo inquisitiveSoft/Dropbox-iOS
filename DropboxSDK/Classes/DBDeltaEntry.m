@@ -15,7 +15,7 @@
 
 - (id)initWithArray:(NSArray *)array {
     if ((self = [super init])) {
-        lowercasePath = [[array objectAtIndex:0] retain];
+        lowercasePath = [array objectAtIndex:0];
         NSObject *maybeMetadata = [array objectAtIndex:1];
         if (maybeMetadata != [NSNull null]) {
             metadata = [[DBMetadata alloc] initWithDictionary:[array objectAtIndex:1]];
@@ -24,11 +24,6 @@
     return self;
 }
 
-- (void)dealloc {
-    [lowercasePath release];
-    [metadata release];
-    [super dealloc];
-}
 
 - (BOOL)isEqualToDeltaEntry:(DBDeltaEntry *)entry {
     if (self == entry) return YES;
@@ -46,11 +41,15 @@
 
 #pragma mark NSCoding methods
 
-- (id)initWithCoder:(NSCoder*)coder {
-    if ((self = [super init])) {
-        lowercasePath = [[coder decodeObjectForKey:@"lowercasePath"] retain];
-        metadata = [[coder decodeObjectForKey:@"metadata"] retain];
+- (id)initWithCoder:(NSCoder*)coder
+{
+	self = [super init];
+	
+    if(self) {
+        lowercasePath = [coder decodeObjectForKey:@"lowercasePath"];
+        metadata = [coder decodeObjectForKey:@"metadata"];
     }
+	
     return self;
 }
 

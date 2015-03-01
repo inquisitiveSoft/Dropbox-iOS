@@ -22,9 +22,6 @@ typedef enum {
 
 typedef void DBLogCallback(DBLogLevel logLevel, NSString *format, va_list args);
 
-NSString * DBLogFilePath(void);
-void DBSetupLogToFile(void);
-
 NSString* DBStringFromLogLevel(DBLogLevel logLevel);
 
 

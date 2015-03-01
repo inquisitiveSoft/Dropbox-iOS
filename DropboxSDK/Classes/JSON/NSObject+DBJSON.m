@@ -36,18 +36,20 @@
 - (NSString *)JSONFragment {
     DBJsonWriter *jsonWriter = [DBJsonWriter new];
     NSString *json = [jsonWriter stringWithFragment:self];    
-    if (!json)
+    if(!json) {
         NSLog(@"-JSONFragment failed. Error trace is: %@", [jsonWriter errorTrace]);
-    [jsonWriter release];
+	}
+	
     return json;
 }
 
 - (NSString *)JSONRepresentation {
     DBJsonWriter *jsonWriter = [DBJsonWriter new];    
     NSString *json = [jsonWriter stringWithObject:self];
-    if (!json)
+    if(!json) {
         NSLog(@"-JSONRepresentation failed. Error trace is: %@", [jsonWriter errorTrace]);
-    [jsonWriter release];
+	}
+	
     return json;
 }
 

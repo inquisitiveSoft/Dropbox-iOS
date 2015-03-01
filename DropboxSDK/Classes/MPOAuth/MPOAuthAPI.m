@@ -55,9 +55,9 @@ NSString * const MPOAuthTokenRefreshDateDefaultsKey		= @"MPOAuthAutomaticTokenRe
 		self.baseURL = inBaseURL;
 		self.authenticationState = MPOAuthAuthenticationStateUnauthenticated;
 		credentials_ = [[MPOAuthCredentialConcreteStore alloc] initWithCredentials:inCredentials forBaseURL:inBaseURL withAuthenticationURL:inAuthURL];
-		self.authenticationMethod = [[[MPOAuthAuthenticationMethod alloc] initWithAPI:self forURL:inAuthURL] autorelease];	
+		self.authenticationMethod = [[MPOAuthAuthenticationMethod alloc] initWithAPI:self forURL:inAuthURL];
 		self.signatureScheme = MPOAuthSignatureSchemeHMACSHA1;
-
+		
 		activeLoaders_ = [[NSMutableArray alloc] initWithCapacity:10];
 		
 		if (aFlag) {
@@ -67,15 +67,6 @@ NSString * const MPOAuthTokenRefreshDateDefaultsKey		= @"MPOAuthAutomaticTokenRe
 	return self;	
 }
 
-- (oneway void)dealloc {
-	self.credentials = nil;
-	self.baseURL = nil;
-	self.authenticationURL = nil;
-	self.authenticationMethod = nil;
-	self.activeLoaders = nil;
-	
-	[super dealloc];
-}
 
 @synthesize credentials = credentials_;
 @synthesize baseURL = baseURL_;
@@ -148,9 +139,6 @@ NSString * const MPOAuthTokenRefreshDateDefaultsKey		= @"MPOAuthAutomaticTokenRe
 	
 	[loader loadSynchronously:NO];
 	//	[self.activeLoaders addObject:loader];
-	
-	[loader release];
-	[aRequest release];
 }
 
 - (void)performURLRequest:(NSURLRequest *)inRequest withTarget:(id)inTarget andAction:(SEL)inAction {
@@ -167,9 +155,6 @@ NSString * const MPOAuthTokenRefreshDateDefaultsKey		= @"MPOAuthAutomaticTokenRe
 	
 	[loader loadSynchronously:NO];
 	//	[self.activeLoaders addObject:loader];
-	
-	[loader release];
-	[aRequest release];	
 }
 
 - (NSData *)dataForMethod:(NSString *)inMethod {
@@ -187,9 +172,6 @@ NSString * const MPOAuthTokenRefreshDateDefaultsKey		= @"MPOAuthAutomaticTokenRe
 
 	loader.credentials = self.credentials;
 	[loader loadSynchronously:YES];
-	
-	[loader autorelease];
-	[aRequest release];
 	
 	return loader.data;
 }

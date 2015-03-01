@@ -23,7 +23,6 @@
     NSMutableDictionary* loadRequests;
     NSMutableDictionary* imageLoadRequests;
     NSMutableDictionary* uploadRequests;
-    id<DBRestClientDelegate> delegate;
 }
 
 - (id)initWithSession:(DBSession*)session;

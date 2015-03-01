@@ -41,7 +41,7 @@ id<DBNetworkRequestDelegate> dbNetworkRequestDelegate = nil;
 
 - (id)initWithURLRequest:(NSURLRequest *)aRequest andInformTarget:(id)aTarget selector:(SEL)aSelector {
     if ((self = [super init])) {
-        request = [aRequest retain];
+        request = aRequest;
         target = aTarget;
         selector = aSelector;
         
@@ -54,20 +54,6 @@ id<DBNetworkRequestDelegate> dbNetworkRequestDelegate = nil;
 
 - (void) dealloc {
     [urlConnection cancel];
-    
-    [request release];
-    [urlConnection release];
-    [fileHandle release];
-    [fileManager release];
-    [userInfo release];
-    [sourcePath release];
-    [response release];
-    [xDropboxMetadataJSON release];
-    [resultFilename release];
-    [tempFilename release];
-    [resultData release];
-    [error release];
-    [super dealloc];
 }
 
 @synthesize failureSelector;
@@ -86,9 +72,8 @@ id<DBNetworkRequestDelegate> dbNetworkRequestDelegate = nil;
 @synthesize error;
 
 - (NSString *)resultString {
-    return [[[NSString alloc] 
-             initWithData:resultData encoding:NSUTF8StringEncoding]
-            autorelease];
+    return [[NSString alloc]
+             initWithData:resultData encoding:NSUTF8StringEncoding];
 }
 
 - (NSObject *)resultJSON {
@@ -143,16 +128,16 @@ id<DBNetworkRequestDelegate> dbNetworkRequestDelegate = nil;
 #pragma mark NSURLConnection delegate methods
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)aResponse {
-    response = [(NSHTTPURLResponse *)aResponse retain];
-
+    response = (NSHTTPURLResponse *)aResponse;
+	
     // Parse out the x-response-metadata as JSON.
-    xDropboxMetadataJSON = [[[[response allHeaderFields] objectForKey:@"X-Dropbox-Metadata"] JSONValue] retain];
+    xDropboxMetadataJSON = [[[response allHeaderFields] objectForKey:@"X-Dropbox-Metadata"] JSONValue];
 
     if (resultFilename && [self statusCode] == 200) {
         // Create the file here so it's created in case it's zero length
         // File is downloaded into a temporary file and then moved over when completed successfully
         NSString *filename = [[NSProcessInfo processInfo] globallyUniqueString];
-        tempFilename = [[NSTemporaryDirectory() stringByAppendingPathComponent:filename] retain];
+        tempFilename = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
         
         BOOL success = [fileManager createFileAtPath:tempFilename contents:nil attributes:nil];
         if (!success) {
@@ -160,7 +145,7 @@ id<DBNetworkRequestDelegate> dbNetworkRequestDelegate = nil;
                        errno, strerror(errno));
         }
 
-        fileHandle = [[NSFileHandle fileHandleForWritingAtPath:tempFilename] retain];
+        fileHandle = [NSFileHandle fileHandleForWritingAtPath:tempFilename];
     }
 }
 
@@ -202,7 +187,6 @@ id<DBNetworkRequestDelegate> dbNetworkRequestDelegate = nil;
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     [fileHandle closeFile];
-    [fileHandle release];
     fileHandle = nil;
     
     if (self.statusCode != 200) {
@@ -214,7 +198,6 @@ id<DBNetworkRequestDelegate> dbNetworkRequestDelegate = nil;
             @try {
                 DBJsonParser *jsonParser = [DBJsonParser new];
                 NSObject *resultJSON = [jsonParser objectWithString:resultString];
-                [jsonParser release];
                 
                 if ([resultJSON isKindOfClass:[NSDictionary class]]) {
                     [errorUserInfo addEntriesFromDictionary:(NSDictionary *)resultJSON];
@@ -249,8 +232,7 @@ id<DBNetworkRequestDelegate> dbNetworkRequestDelegate = nil;
                 [self setError:[NSError errorWithDomain:moveError.domain code:moveError.code userInfo:self.userInfo]];
             }
         }
-        
-        [tempFilename release];
+		
         tempFilename = nil;
     }
     
@@ -274,7 +256,7 @@ id<DBNetworkRequestDelegate> dbNetworkRequestDelegate = nil;
             DBLogError(@"DBRequest#connection:didFailWithError: error removing temporary file: %@", 
                     [removeError localizedDescription]);
         }
-        [tempFilename release];
+		
         tempFilename = nil;
     }
     
@@ -354,9 +336,11 @@ id<DBNetworkRequestDelegate> dbNetworkRequestDelegate = nil;
 #pragma mark private methods
 
 - (void)setError:(NSError *)theError {
-    if (theError == error) return;
-    [error release];
-    error = [theError retain];
+    if (theError == error) {
+		return;
+	}
+	
+    error = theError;
 
 	NSString *errorStr = [error.userInfo objectForKey:@"error"];
 	if (!errorStr) {
@@ -394,10 +378,10 @@ id<DBNetworkRequestDelegate> dbNetworkRequestDelegate = nil;
                     continue;
                 }
                 CFRelease(rawCert);
-                [certs addObject:(id)cert];
-                CFRelease(cert);
+                [certs addObject:CFBridgingRelease(cert)];
             }
-            sRootCerts = [certs retain];
+			
+            sRootCerts = certs;
         }
     }
     return sRootCerts;

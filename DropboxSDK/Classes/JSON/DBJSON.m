@@ -42,21 +42,17 @@
     return self;
 }
 
-- (void)dealloc {
-    [jsonWriter release];
-    [jsonParser release];
-    [super dealloc];
-}
 
 #pragma mark Writer 
 
 
 - (NSString *)stringWithObject:(id)obj {
     NSString *repr = [jsonWriter stringWithObject:obj];
-    if (repr)
+	
+    if(repr) {
         return repr;
-    
-    [errorTrace release];
+    }
+	
     errorTrace = [[jsonWriter errorTrace] mutableCopy];
     return nil;
 }
@@ -74,10 +70,10 @@
 - (NSString*)stringWithObject:(id)value allowScalar:(BOOL)allowScalar error:(NSError**)error {
     
     NSString *json = allowScalar ? [jsonWriter stringWithFragment:value] : [jsonWriter stringWithObject:value];
-    if (json)
+    if(json) {
         return json;
+	}
 
-    [errorTrace release];
     errorTrace = [[jsonWriter errorTrace] mutableCopy];
     
     if (error)
@@ -117,10 +113,10 @@
 
 - (id)objectWithString:(NSString *)repr {
     id obj = [jsonParser objectWithString:repr];
-    if (obj)
+    if(obj) {
         return obj;
-
-    [errorTrace release];
+	}
+	
     errorTrace = [[jsonParser errorTrace] mutableCopy];
     
     return nil;
@@ -139,10 +135,11 @@
 - (id)objectWithString:(id)value allowScalar:(BOOL)allowScalar error:(NSError**)error {
 
     id obj = allowScalar ? [jsonParser fragmentWithString:value] : [jsonParser objectWithString:value];
-    if (obj)
+	
+    if(obj) {
         return obj;
-    
-    [errorTrace release];
+    }
+
     errorTrace = [[jsonParser errorTrace] mutableCopy];
 
     if (error)

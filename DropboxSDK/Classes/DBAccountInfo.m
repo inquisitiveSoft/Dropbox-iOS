@@ -12,28 +12,22 @@
 @implementation DBAccountInfo
 
 - (id)initWithDictionary:(NSDictionary*)dict {
-    if ((self = [super init])) {
-        country = [[dict objectForKey:@"country"] retain];
-        displayName = [[dict objectForKey:@"display_name"] retain];
+	self = [super init];
+	
+    if(self) {
+        country = [dict objectForKey:@"country"];
+        displayName = [dict objectForKey:@"display_name"];
         if ([dict objectForKey:@"quota_info"]) {
             quota = [[DBQuota alloc] initWithDictionary:[dict objectForKey:@"quota_info"]];
         }
-        userId = [[[dict objectForKey:@"uid"] stringValue] retain];
-        referralLink = [[dict objectForKey:@"referral_link"] retain];
-        original = [dict retain];
+        userId = [[dict objectForKey:@"uid"] stringValue];
+        referralLink = [dict objectForKey:@"referral_link"];
+        original = dict;
     }
+	
     return self;
 }
 
-- (void)dealloc {
-    [country release];
-    [displayName release];
-    [quota release];
-    [userId release];
-    [referralLink release];
-    [original release];
-    [super dealloc];
-}
 
 @synthesize country;
 @synthesize displayName;

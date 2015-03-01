@@ -30,7 +30,6 @@ extern NSString *kDBProtocolHTTPS;
     NSMutableDictionary *credentialStores;
     MPOAuthCredentialConcreteStore *anonymousStore;
     NSString *root;
-    id<DBSessionDelegate> delegate;
 }
 
 + (DBSession*)sharedSession;
@@ -47,7 +46,7 @@ extern NSString *kDBProtocolHTTPS;
 
 @property (nonatomic, readonly) NSString *root;
 @property (nonatomic, readonly) NSArray *userIds;
-@property (nonatomic, assign) id<DBSessionDelegate> delegate;
+@property (nonatomic, assign) id <DBSessionDelegate> delegate;
 
 @end
 

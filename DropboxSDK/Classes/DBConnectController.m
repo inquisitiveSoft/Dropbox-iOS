@@ -52,8 +52,7 @@ extern id<DBNetworkRequestDelegate> dbNetworkRequestDelegate;
 - (void)setAlertView:(UIAlertView *)pAlertView {
     if (pAlertView == alertView) return;
     alertView.delegate = nil;
-    [alertView release];
-    alertView = [pAlertView retain];
+    alertView = pAlertView;
 }
 
 @synthesize rootController;
@@ -82,10 +81,7 @@ extern id<DBNetworkRequestDelegate> dbNetworkRequestDelegate;
         self.session = pSession;
 
         self.title = @"Dropbox";
-        self.navigationItem.rightBarButtonItem =
-            [[[UIBarButtonItem alloc]
-              initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel)]
-             autorelease];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel)];
 
 #ifdef __IPHONE_7_0 // Temporary until we can switch to XCode 5 for release.
         if (NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_6_1) {
@@ -97,25 +93,19 @@ extern id<DBNetworkRequestDelegate> dbNetworkRequestDelegate;
 }
 
 - (void)dealloc {
-	[session release];
-    alertView.delegate = nil;
-    [alertView release];
-    [url release];
-    if (webView.isLoading) {
+
+    if(webView.isLoading) {
         [webView stopLoading];
     }
-    webView.delegate = nil;
-    [webView release];
-    [super dealloc];
 }
+
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 
     self.view.backgroundColor = [UIColor colorWithRed:241.0/255 green:249.0/255 blue:255.0/255 alpha:1.0];
 
-    UIActivityIndicatorView *activityIndicator =
-        [[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray] autorelease];
+    UIActivityIndicatorView *activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     activityIndicator.autoresizingMask =
         UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin |
         UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
@@ -126,7 +116,7 @@ extern id<DBNetworkRequestDelegate> dbNetworkRequestDelegate;
     [activityIndicator startAnimating];
     [self.view addSubview:activityIndicator];
 
-    self.webView = [[[UIWebView alloc] initWithFrame:self.view.frame] autorelease];
+    self.webView = [[UIWebView alloc] initWithFrame:self.view.frame];
     self.webView.delegate = self;
     self.webView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.webView.scalesPageToFit = YES;
@@ -139,11 +129,12 @@ extern id<DBNetworkRequestDelegate> dbNetworkRequestDelegate;
 
 - (void)viewDidUnload {
     [super viewDidUnload];
-    if ([webView isLoading]) {
+	
+	if([webView isLoading]) {
         [webView stopLoading];
     }
+	
     webView.delegate = nil;
-    [webView release];
     webView = nil;
 }
 
@@ -205,18 +196,16 @@ extern id<DBNetworkRequestDelegate> dbNetworkRequestDelegate;
         NSString *okStr = NSLocalizedString(@"OK", nil);
 
         self.alertView =
-            [[[UIAlertView alloc]
-              initWithTitle:title message:message delegate:nil cancelButtonTitle:okStr otherButtonTitles:nil]
-             autorelease];
+            [[UIAlertView alloc]
+              initWithTitle:title message:message delegate:nil cancelButtonTitle:okStr otherButtonTitles:nil];
     } else {
         // if the page hasn't loaded, this alert gives the user a way to retry
         NSString *retryStr = NSLocalizedString(@"Retry", @"Retry loading a page that has failed to load");
 
         self.alertView =
-            [[[UIAlertView alloc]
+            [[UIAlertView alloc]
               initWithTitle:title message:message delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", @"")
-              otherButtonTitles:retryStr, nil]
-             autorelease];
+              otherButtonTitles:retryStr, nil];
     }
 
     [self.alertView show];
@@ -244,9 +233,9 @@ extern id<DBNetworkRequestDelegate> dbNetworkRequestDelegate;
         return NO;
     } else if (![[[request URL] dbPathComponents] isEqual:[self.url dbPathComponents]]) {
         DBConnectController *childController =
-            [[[DBConnectController alloc] initWithUrlRequest:request
+            [[DBConnectController alloc] initWithUrlRequest:request
                                               fromController:self.rootController
-                                                     session:self.session] autorelease];
+                                                     session:self.session];
 
         NSDictionary *queryParams = [DBSession parseURLParams:[[request URL] query]];
         NSString *title = [queryParams objectForKey:@"embed_title"];
@@ -284,9 +273,7 @@ extern id<DBNetworkRequestDelegate> dbNetworkRequestDelegate;
 #pragma mark private methods
 
 + (NSURLRequest *)requestForUrl:(NSURL *)reqUrl {
-    return [[[NSURLRequest alloc] initWithURL:reqUrl
-                                  cachePolicy:NSURLCacheStorageNotAllowed
-                              timeoutInterval:20] autorelease];
+    return [[NSURLRequest alloc] initWithURL:reqUrl cachePolicy:NSURLCacheStorageNotAllowed timeoutInterval:20];
 }
 
 - (void)loadRequest {
@@ -324,6 +311,7 @@ extern id<DBNetworkRequestDelegate> dbNetworkRequestDelegate;
     if ([webView isLoading]) {
         [webView stopLoading];
     }
+	
     [self.navigationController dismissModalViewControllerAnimated:animated];
 }
 

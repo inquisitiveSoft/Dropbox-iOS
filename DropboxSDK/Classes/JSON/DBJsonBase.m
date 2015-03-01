@@ -38,15 +38,13 @@ NSString * DBJSONErrorDomain = @"org.brautaset.JSON.ErrorDomain";
 
 - (id)init {
     self = [super init];
-    if (self)
+    if (self) {
         self.maxDepth = 512;
+	}
+	
     return self;
 }
 
-- (void)dealloc {
-    [errorTrace release];
-    [super dealloc];
-}
 
 - (void)addErrorWithCode:(NSUInteger)code description:(NSString*)str {
     NSDictionary *userInfo;
@@ -68,9 +66,9 @@ NSString * DBJSONErrorDomain = @"org.brautaset.JSON.ErrorDomain";
     [self didChangeValueForKey:@"errorTrace"];
 }
 
-- (void)clearErrorTrace {
+- (void)clearErrorTrace
+{
     [self willChangeValueForKey:@"errorTrace"];
-    [errorTrace release];
     errorTrace = nil;
     [self didChangeValueForKey:@"errorTrace"];
 }

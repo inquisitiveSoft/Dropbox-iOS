@@ -8,6 +8,7 @@
 
 #import "DBSession+iOS.h"
 
+#import <UIKit/UIKit.h>
 #import <CommonCrypto/CommonDigest.h>
 
 #import "DBConnectController.h"
@@ -24,13 +25,11 @@ static NSString *kDBLinkNonce = @"dropbox.sync.nonce";
 
 + (NSDictionary*)parseURLParams:(NSString *)query {
     NSArray *pairs = [query componentsSeparatedByString:@"&"];
-    NSMutableDictionary *params = [[[NSMutableDictionary alloc] init] autorelease];
+    NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+	
     for (NSString *pair in pairs) {
         NSArray *kv = [pair componentsSeparatedByString:@"="];
-        NSString *val =
-        [[kv objectAtIndex:1]
-         stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-
+        NSString *val = [[kv objectAtIndex:1] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
         [params setObject:val forKey:[kv objectAtIndex:0]];
     }
     return params;
@@ -82,7 +81,7 @@ static NSString *kDBLinkNonce = @"dropbox.sync.nonce";
     CFUUIDRef uuid = CFUUIDCreate(NULL);
     CFStringRef uuid_str = CFUUIDCreateString(NULL, uuid);
     CFRelease(uuid);
-    NSString *nonce = [(NSString *)uuid_str autorelease];
+    NSString *nonce = CFBridgingRelease(uuid_str);
     [[NSUserDefaults standardUserDefaults] setObject:nonce forKey:kDBLinkNonce];
     [[NSUserDefaults standardUserDefaults] synchronize];
 
@@ -98,14 +97,15 @@ static NSString *kDBLinkNonce = @"dropbox.sync.nonce";
         urlStr = [NSString stringWithFormat:@"%@://%@/%@/connect_login?k=%@&s=%@&state=%@&easl=1%@",
                   kDBProtocolHTTPS, kDBDropboxWebHost, kDBDropboxAPIVersion,
                   consumerKey, secret, nonce, userIdStr];
-        UIViewController *connectController = [[[DBConnectController alloc] initWithUrl:[NSURL URLWithString:urlStr] fromController:rootController session:self] autorelease];
-        UINavigationController *navController = [[[UINavigationController alloc] initWithRootViewController:connectController] autorelease];
+        UIViewController *connectController = [[DBConnectController alloc] initWithUrl:[NSURL URLWithString:urlStr] fromController:rootController session:self];
+        UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:connectController];
+		
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
             connectController.modalPresentationStyle = UIModalPresentationFormSheet;
             navController.modalPresentationStyle = UIModalPresentationFormSheet;
         }
 
-        [rootController presentModalViewController:navController animated:YES];
+        [rootController presentViewController:navController animated:TRUE completion:NULL];
     }
 }
 

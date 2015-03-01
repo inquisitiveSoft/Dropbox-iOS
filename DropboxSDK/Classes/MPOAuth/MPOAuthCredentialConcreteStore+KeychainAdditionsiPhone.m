@@ -22,7 +22,7 @@
 	NSString *securityDomain = [self.authenticationURL host];
 //	NSString *itemID = [NSString stringWithFormat:@"%@.oauth.%@", [[NSBundle mainBundle] bundleIdentifier], inName];
 	NSDictionary *searchDictionary = nil;
-	NSDictionary *keychainItemAttributeDictionary = [NSDictionary dictionaryWithObjectsAndKeys:	(id)kSecClassInternetPassword, kSecClass,
+	NSDictionary *keychainItemAttributeDictionary = [NSDictionary dictionaryWithObjectsAndKeys:	(__bridge id)kSecClassInternetPassword, kSecClass,
 																								securityDomain, kSecAttrSecurityDomain,
 																								serverName, kSecAttrServer,
 																								inName, kSecAttrAccount,
@@ -34,12 +34,11 @@
 	
 	if ([self findValueFromKeychainUsingName:inName returningItem:&searchDictionary]) {
 		NSMutableDictionary *updateDictionary = [keychainItemAttributeDictionary mutableCopy];
-		[updateDictionary removeObjectForKey:(id)kSecClass];
+		[updateDictionary removeObjectForKey:(__bridge id)kSecClass];
 		
-		SecItemUpdate((CFDictionaryRef)keychainItemAttributeDictionary, (CFDictionaryRef)updateDictionary);
-		[updateDictionary release];
+		SecItemUpdate((__bridge CFDictionaryRef)keychainItemAttributeDictionary, (__bridge CFDictionaryRef)updateDictionary);
 	} else {
-		OSStatus success = SecItemAdd( (CFDictionaryRef)keychainItemAttributeDictionary, NULL);
+		OSStatus success = SecItemAdd((__bridge CFDictionaryRef)keychainItemAttributeDictionary, NULL);
 		
 		if (success == errSecNotAvailable) {
 			[NSException raise:@"Keychain Not Available" format:@"Keychain Access Not Currently Available"];
@@ -57,23 +56,25 @@
 	NSString *foundPassword = nil;
 	NSString *serverName = [self.baseURL host];
 	NSString *securityDomain = [self.authenticationURL host];
-	NSDictionary *attributesDictionary = nil;
 	NSData *foundValue = nil;
 	OSStatus status = noErr;
 //	NSString *itemID = [NSString stringWithFormat:@"%@.oauth.%@", [[NSBundle mainBundle] bundleIdentifier], inName];
 	
-	NSMutableDictionary *searchDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:(id)kSecClassInternetPassword, (id)kSecClass,
-																							  securityDomain, (id)kSecAttrSecurityDomain,
-																							  serverName, (id)kSecAttrServer,
-																							  inName, (id)kSecAttrAccount,
-																							  (id)kSecMatchLimitOne, (id)kSecMatchLimit,
-																							  (id)kCFBooleanTrue, (id)kSecReturnData,
-																							  (id)kCFBooleanTrue, (id)kSecReturnAttributes,
-																							  (id)kCFBooleanTrue, (id)kSecReturnPersistentRef,
+	NSMutableDictionary *searchDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:(__bridge id)kSecClassInternetPassword, (__bridge id)kSecClass,
+																							  securityDomain, (__bridge id)kSecAttrSecurityDomain,
+																							  serverName, (__bridge id)kSecAttrServer,
+																							  inName, (__bridge id)kSecAttrAccount,
+																							  (__bridge id)kSecMatchLimitOne, (__bridge id)kSecMatchLimit,
+																							  (__bridge id)kCFBooleanTrue, (__bridge id)kSecReturnData,
+																							  (__bridge id)kCFBooleanTrue, (__bridge id)kSecReturnAttributes,
+																							  (__bridge id)kCFBooleanTrue, (__bridge id)kSecReturnPersistentRef,
 											 nil];
 
-	status = SecItemCopyMatching((CFDictionaryRef)searchDictionary, (CFTypeRef *)&attributesDictionary);		
-	foundValue = [attributesDictionary objectForKey:(id)kSecValueData];
+	CFTypeRef attributesCFDictionary = nil;
+	status = SecItemCopyMatching((__bridge CFDictionaryRef)searchDictionary, (CFTypeRef *)&attributesCFDictionary);
+	NSDictionary *attributesDictionary = CFBridgingRelease(attributesCFDictionary);
+	
+	foundValue = [attributesDictionary objectForKey:(__bridge id)kSecValueData];
 	if (outKeychainItemRef) {
 		*outKeychainItemRef = attributesDictionary;
 	}
@@ -82,21 +83,22 @@
 		foundPassword = [[NSString alloc] initWithData:foundValue encoding:NSUTF8StringEncoding];
 	}
 	
-	return [foundPassword autorelease];
+	return foundPassword;
 }
+
 
 - (void)removeValueFromKeychainUsingName:(NSString *)inName {
 	NSString *serverName = [self.baseURL host];
 	NSString *securityDomain = [self.authenticationURL host];
 
-	NSMutableDictionary *searchDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:	(id)kSecClassInternetPassword, (id)kSecClass,
-																								 securityDomain, (id)kSecAttrSecurityDomain,
-																								 serverName, (id)kSecAttrServer,
-																								 inName, (id)kSecAttrAccount,
+	NSMutableDictionary *searchDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:	(__bridge id)kSecClassInternetPassword, (__bridge id)kSecClass,
+																								 securityDomain, (__bridge id)kSecAttrSecurityDomain,
+																								 serverName, (__bridge id)kSecAttrServer,
+																								 inName, (__bridge id)kSecAttrAccount,
 																								 nil];
 	
-	OSStatus success = SecItemDelete((CFDictionaryRef)searchDictionary);
-
+	OSStatus success = SecItemDelete((__bridge CFDictionaryRef)searchDictionary);
+	
 	if (success == errSecNotAvailable) {
 		[NSException raise:@"Keychain Not Available" format:@"Keychain Access Not Currently Available"];
 	} else if (success == errSecParam) {

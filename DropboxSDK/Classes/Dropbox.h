@@ -1,5 +1,5 @@
 /*
- *  DropboxSDK.h
+ *  Dropbox.h
  *  DropboxSDK
  *
  *  Created by Brian Smith on 7/13/10.

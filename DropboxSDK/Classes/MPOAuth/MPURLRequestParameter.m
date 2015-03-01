@@ -32,11 +32,7 @@
 		currentParameter.value = [value stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 		
 		[foundParameters addObject:currentParameter];
-		
-		[currentParameter release];
 	}
-	
-	[parameterScanner release];
 	
 	return foundParameters;
 }
@@ -51,10 +47,9 @@
 		aURLParameter.value = [inDictionary objectForKey:aKey];
 		
 		[parameterArray addObject:aURLParameter];
-		[aURLParameter release];
 	}
 	
-	return [parameterArray autorelease];
+	return parameterArray;
 }
 
 + (NSDictionary *)parameterDictionaryFromString:(NSString *)inString {
@@ -75,8 +70,6 @@
 			
 			[foundParameters setObject:[value stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding] forKey:name];
 		}
-		
-		[parameterScanner release];
 	}
 	return foundParameters;
 }
@@ -96,7 +89,7 @@
 		}
 	}
 	
-	return [queryString autorelease];
+	return queryString;
 }
 
 + (NSString *)parameterStringForDictionary:(NSDictionary *)inParameterDictionary {
@@ -121,13 +114,6 @@
 		self.value = inValue;
 	}
 	return self;
-}
-
-- (oneway void)dealloc {
-	self.name = nil;
-	self.value = nil;
-	
-	[super dealloc];
 }
 
 @synthesize name = _name;
